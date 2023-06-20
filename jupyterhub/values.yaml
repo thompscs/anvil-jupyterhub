@@ -341,7 +341,7 @@ singleuser:
   cloudMetadata:
     # block set to true will append a privileged initContainer using the
     # iptables to block the sensitive metadata server at the provided ip.
-    blockWithIptables: true
+    blockWithIptables: false
     ip: 169.254.169.254
   networkPolicy:
     enabled: true
@@ -360,7 +360,10 @@ singleuser:
     hub.jupyter.org/network-access-hub: "true"
   extraFiles: {}
   extraEnv: {}
-  lifecycleHooks: {}
+  lifecycleHooks:
+    postStart:
+      exec:
+        command: ["bash", "-c", "if [ -d /startup ]; then cd /startup; for s in *.sh; do bash -e $s; done; fi"]
   initContainers: []
   extraContainers: []
   allowPrivilegeEscalation: false
@@ -370,8 +373,13 @@ singleuser:
   storage:
     type: dynamic
     extraLabels: {}
-    extraVolumes: []
-    extraVolumeMounts: []
+    extraVolumes:
+      - name: startup-volume
+        configMap:
+          name: startup-configmap
+    extraVolumeMounts:
+      - name: startup-volume
+        mountPath: /startup
     static:
       pvcName:
       subPath: "{username}"
@@ -405,7 +413,7 @@ singleuser:
 # scheduling relates to the user-scheduler pods and user-placeholder pods.
 scheduling:
   userScheduler:
-    enabled: true
+    enabled: false
     revisionHistoryLimit:
     replicas: 2
     logLevel: 4
@@ -608,7 +616,7 @@ prePuller:
       name:
       annotations: {}
   continuous:
-    enabled: true
+    enabled: false
   pullProfileListImages: true
   extraImages: {}
   pause:

@@ -1,0 +1,9 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: startup-configmap
+data:
+  {{- range $path, $_ := .Files.Glob "files/startup/**" }}
+  {{ $path | trimPrefix "files/startup/" }}: |-
+{{ $.Files.Get $path | indent 4 }}
+  {{ end }}
