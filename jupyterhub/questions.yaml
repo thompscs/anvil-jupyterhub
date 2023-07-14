@@ -1,0 +1,89 @@
+- name: Project Name
+  type: input
+  message: "Enter the project name:"
+  default: "myproject"
+  store_as: project_name
+  description: "Please enter the desired project name. It needs to be a single word, and it will be used in the URL as https://<MYPROJECT>.anvilcloud.rcac.purdue.edu"
+
+- name: Materials URL
+  variable: singleuser.extraEnv.COURSE_MATERIALS
+  label: "Materials URL"
+  type: input
+  description: "Enter a URL for an archive or Git repository with additional course materials (optional). If provided, the contents will be included in the generated JupyterLab image."
+
+- name: Authentication Method
+  variable: hub.config.Authenticator.authenticator_class
+  label: "Authentication Method"
+  type: enum
+  default: "basic"
+  options: ["basic", "cilogon"]
+  description: "Choose the authentication method"
+  group: "Authentication Settings"
+
+- name: Basic Authentication Username
+  variable: hub.config.Authenticator.admin_users[0]
+  label: "Username"
+  type: string
+  required: true
+  description: "Enter the username for basic authentication"
+  group: "Authentication Settings"
+  show_if: "hub.config.Authenticator.authenticator_class=basic"
+
+- name: Basic Authentication Password
+  variable: hub.config.Authenticator.admin_users[0]
+  label: "Password"
+  type: password
+  required: true
+  description: "Enter the password for basic authentication"
+  group: "Authentication Settings"
+  show_if: "hub.config.Authenticator.authenticator_class=basic"
+
+- name: User Name
+  variable: hub.config.CILogonOAuthenticator.username_claim
+  label: "User Name"
+  type: string
+  required: true
+  description: "Enter the requested user name"
+  group: "Authentication Settings"
+  show_if: "hub.config.Authenticator.authenticator_class=cilogon"
+
+- name: Container Image
+  variable: singleuser.image
+  label: "Container Image"
+  type: enum
+  default: "default"
+  options: ["default", "jupyter/datascience-notebook", "tensorflow/tensorflow", "custom"]
+  description: "Choose the container image"
+  group: "Container Settings"
+
+- name: Custom Container Image
+  variable: singleuser.image.custom
+  label: "Custom Container Image"
+  type: string
+  description: "Specify a custom Docker image"
+  group: "Container Settings"
+  show_if: "singleuser.image=custom"
+
+- name: Additional Python Libraries
+  variable: singleuser.extraPythonLibraries
+  label: "Additional Python Libraries"
+  type: textarea
+  description: "Enter a list of Python libraries to install (one per line)"
+  group: "Container Settings"
+  show_if: "singleuser.image=custom"
+
+- name: Custom Python Packages Requirements
+  variable: singleuser.requirements
+  label: "Custom Python Packages Requirements"
+  type: boolean
+  default: false
+  description: "Specify if a requirements.txt file for additional Python packages should be included"
+  group: "Container Settings"
+
+- name: Custom Python Packages Requirements File
+  variable: singleuser.requirements.content
+  label: "Custom Python Packages Requirements File"
+  type: textarea
+  description: "Enter the content of the requirements.txt file for additional Python packages"
+  group: "Container Settings"
+  show_if: "singleuser.image=custom && singleuser.requirements=true"
